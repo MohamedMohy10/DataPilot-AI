@@ -1,9 +1,7 @@
-# 📊 DataPilot AI
-
-An autonomous data analysis system powered by LangGraph and LLMs. 
+# 📊 DataPilot-AI - Autonomous data analysis system. 
 Upload any CSV dataset, ask a question, and the agent autonomously performs end-to-end analusis, it plans, executes, reflects, and synthesizes a full analytical report with visualizations.
 
-## 🎯 What is special about DataPilot AI ?
+## 🎯 What is special about DataPilot-AI ?
 
 While general LLMs can analyze datasets interactively, they are not designed to execute structured, multi-step analytical workflows with reliability and reproducibility.
 
@@ -109,9 +107,9 @@ Get a free key at [NVIDIA](https://build.nvidia.com/)
 Also create `.env` file, inside it write
 `NVIDIA_API_KEY`=your_api_key_here
 
-you can ofcourse use any other LLm api you have, NVIDIA is just an example and what was used during the development and testing of this project.
+you can of course use any other LLm api you have, NVIDIA is just an example and what was used during the development and testing of this project.
 
-
+---
 ⚠️ Limitations 
 - This is still a demo version, so mistakes or bugs are expected
 - Performance depends on LLM latency and API limits
