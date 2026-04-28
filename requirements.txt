@@ -1,0 +1,11 @@
+langgraph
+langchain-core
+openai
+pandas
+numpy
+matplotlib
+seaborn
+streamlit
+reportlab
+python-dotenv
+rich
