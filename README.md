@@ -1,7 +1,7 @@
-# 📊 DataPilot-AI - Autonomous data analysis system. 
+# 📊 DataPilot AI - Autonomous data analysis system. 
 Upload any CSV dataset, ask a question, and the agent autonomously performs end-to-end analusis, it plans, executes, reflects, and synthesizes a full analytical report with visualizations.
 
-## 🎯 What is special about DataPilot-AI ?
+## 🎯 What is special about DataPilot AI ?
 
 While general LLMs can analyze datasets interactively, they are not designed to execute structured, multi-step analytical workflows with reliability and reproducibility.
 
