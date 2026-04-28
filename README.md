@@ -22,22 +22,22 @@ The system is implemented as a **LangGraph state machine** with the following no
 ↓
 [Final Answer]
 
-- **Planner Node** — Decomposes the user query into analysis steps
-- **Executor Node** — Generates and executes Python code with self-healing retry loop
-- **Evaluator Node** — Reflects on progress and decides whether to continue or finalize
-- **Memory Node** — Persists dataframe state and insights across steps
-- **Final Answer Node** — Synthesizes all findings into a structured report
+- **Planner Node** : Decomposes the user query into analysis steps
+- **Executor Node** : Generates and executes Python code with self-healing retry loop
+- **Evaluator Node** : Reflects on progress and decides whether to continue or finalize
+- **Memory Node** : Persists dataframe state and insights across steps
+- **Final Answer Node** : Synthesizes all findings into a structured report
 
 ## ✨ Features
 
-- 🔄 **ReAct agent loop** — Plan → Act → Observe → Reflect → Repeat
-- 🐍 **Dynamic code execution** — LLM writes and runs pandas/matplotlib code
-- 🔁 **Self-healing retries** — Agent fixes its own errors automatically
-- 📊 **Auto EDA** — Automatic profiling on upload
-- 💬 **Follow-up chat** — Continue conversing after report generation
-- 📈 **On-demand plots** — Request new visualizations in chat
-- 📄 **PDF export** — Download full report with embedded plots
-- 🖥️ **Streamlit UI** — Clean web interface
+- 🔄 **ReAct agent loop** : Plan → Act → Observe → Reflect → Repeat
+- 🐍 **Dynamic code execution** : LLM writes and runs pandas/matplotlib code
+- 🔁 **Self-healing retries** : Agent fixes its own errors automatically
+- 📊 **Auto EDA** : Automatic profiling on upload
+- 💬 **Follow-up chat** : Continue conversing after report generation
+- 📈 **On-demand plots** : Request new visualizations in chat
+- 📄 **PDF export** : Download full report with embedded plots
+- 🖥️ **Streamlit UI** : Clean web interface
 
 ## 🛠️ Tech Stack
 
@@ -72,7 +72,7 @@ streamlit run app.py
 ```
 
 ## 📁 Project Structure
-data-analyst-agent/
+`data-analyst-agent/
 ├── app.py                  # Streamlit UI
 ├── graph.py                # LangGraph state machine
 ├── state.py                # Shared agent state
@@ -90,7 +90,7 @@ data-analyst-agent/
 │   └── registry.py        # Tool schemas
 ├── prompts/                # LLM prompt templates
 ├── memory/                 # Session memory
-└── observability/          # Agent tracing
+└── observability/          # Agent tracing`
 
 ## 📋 Example Queries
 
