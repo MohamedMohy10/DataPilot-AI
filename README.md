@@ -72,7 +72,8 @@ streamlit run app.py
 ```
 
 ## 📁 Project Structure
-`data-analyst-agent/
+```bash
+data-analyst-agent/
 ├── app.py                  # Streamlit UI
 ├── graph.py                # LangGraph state machine
 ├── state.py                # Shared agent state
@@ -90,7 +91,8 @@ streamlit run app.py
 │   └── registry.py        # Tool schemas
 ├── prompts/                # LLM prompt templates
 ├── memory/                 # Session memory
-└── observability/          # Agent tracing`
+└── observability/          # Agent tracing
+```
 
 ## 📋 Example Queries
 
