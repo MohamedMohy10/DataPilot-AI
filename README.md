@@ -110,7 +110,7 @@ Also create `.env` file, inside it write
 you can of course use any other LLm api you have, NVIDIA is just an example and what was used during the development and testing of this project.
 
 ---
-⚠️ Limitations 
+## ⚠️ Limitations 
 - This is still a demo version, so mistakes or bugs are expected
 - Performance depends on LLM latency and API limits
 - Complex datasets may increase execution time
