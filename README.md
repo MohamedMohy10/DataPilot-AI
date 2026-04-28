@@ -105,9 +105,11 @@ data-analyst-agent/
 NVIDIA_API_KEY=your_key_here
 
 Get a free key at [NVIDIA](https://build.nvidia.com/)
-Also create `.env` file
-example:
-NVIDIA_API_KEY=your_api_key_here
+
+Also create `.env` file, inside it write
+`NVIDIA_API_KEY`=your_api_key_here
+
+you can ofcourse use any other LLm api you have, NVIDIA is just an example and what was used during the development and testing of this project.
 
 
 ⚠️ Limitations 
