@@ -1,11 +1,25 @@
+# Core agent
 langgraph
 langchain-core
 openai
+python-dotenv
+
+# Data analysis
 pandas
 numpy
+scipy
+statsmodels
+scikit-learn
+
+# Visualization
 matplotlib
 seaborn
+
+# UI
 streamlit
+
+# PDF generation
 reportlab
-python-dotenv
+
+# Terminal UI
 rich
