@@ -130,3 +130,9 @@ you can of course use any other LLm api you have, NVIDIA is just an example and 
   ```
   Analyze the dataset and provide business insights to improve profitability.
   ```
+  ```
+  If you were a manager, what actions would you take based on this data?
+  ```
+  ```
+  Which regions and product categories are underperforming and why?
+  ```
