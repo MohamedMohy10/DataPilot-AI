@@ -115,7 +115,7 @@ you can of course use any other LLm api you have, NVIDIA is just an example and 
 - Complex datasets may increase execution time
 - Requires careful prompt design for optimal results
 
-  Examples of a good promot:
+  Examples of a good prompt:
   ```
   "Analyze this dataset and find key insights, correlations, and anomalies"
   ```
