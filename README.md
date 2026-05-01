@@ -50,7 +50,6 @@ The system is implemented as a **LangGraph state machine** with the following no
 ### 1. Clone the repo
 ```bash
 git clone https://github.com/MohamedMohy10/DataPilot-AI.git
-cd agentic-data-analyst
 ```
 
 ### 2. Install dependencies
