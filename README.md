@@ -114,3 +114,18 @@ you can of course use any other LLm api you have, NVIDIA is just an example and 
 - Performance depends on LLM latency and API limits
 - Complex datasets may increase execution time
 - Requires careful prompt design for optimal results
+  Examples of a good promot:
+  ```
+  "Analyze this dataset and find key insights, correlations, and anomalies"
+  ```
+  ```
+  "Perform full EDA, detect anomalies, test hypotheses, and generate key insights with visualizations.
+   Rules:
+  - All insights must include numerical evidence
+  - Use statistical validation where applicable
+  - Keep conclusions concise and grounded
+   "
+  ```
+  ```
+  Analyze the dataset and provide business insights to improve profitability.
+  ```
