@@ -42,7 +42,7 @@ Write a comprehensive final report covering:
             {"role": "user", "content": prompt}
         ],
         temperature=0.3,
-        max_tokens=2000,
+        #max_tokens=2000, <- adjust as needed based on your model limits
     )
 
     report = response.choices[0].message.content
@@ -68,7 +68,7 @@ If they ask for new calculations or plots, say you can only answer based on exis
         model=MODEL,
         messages=[{"role": "system", "content": system}] + memory,
         temperature=0.3,
-        max_tokens=1000,
+        #max_tokens=1000, <- adjust as needed based on your model limits
     )
 
     answer = response.choices[0].message.content

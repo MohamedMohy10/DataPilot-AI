@@ -279,7 +279,7 @@ Rules:
                             model=MODEL,
                             messages=[{"role": "user", "content": code_prompt}],
                             temperature=0.1,
-                            max_tokens=500,
+                            #max_tokens=500, <- adjust as needed based on your model limits
                         )
 
                         code = code_response.choices[0].message.content.strip()
@@ -328,7 +328,7 @@ Be concise and reference actual numbers from the report when relevant."""
                             model=MODEL,
                             messages=[{"role": "system", "content": system}] + st.session_state["chat_memory"],
                             temperature=0.3,
-                            max_tokens=1000,
+                            #max_tokens=1000, <- adjust as needed based on your model limits
                         )
 
                         answer = response.choices[0].message.content
