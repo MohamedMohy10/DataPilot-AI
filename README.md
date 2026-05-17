@@ -11,7 +11,7 @@ While general LLMs can analyze datasets interactively, they are not designed to 
 - Runs real Python code (not simulated answers)  
 - Iteratively fixes errors and refines results  
 - Maintains state across steps for consistent reasoning  
-- Produces structured, reproducible outputs (plots, reports)
+- Produces structured, reproducible outputs (plots, dashboards, reports)
 
 ## 🧠 Architecture
 
