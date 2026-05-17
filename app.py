@@ -2,12 +2,15 @@ import streamlit as st
 import tempfile
 import os
 import pandas as pd
+import ast
 from dotenv import load_dotenv
 
 load_dotenv()
 
 from graph import build_graph
 from pdf_generator import generate_pdf_report
+from dashboard import render_static_dashboard
+from plotly_generator import render_plotly_dashboard
 
 # ── Page config ──────────────────────────────────────────────
 st.set_page_config(
@@ -182,18 +185,14 @@ if run_button:
 if "final_state" in st.session_state:
     final_state = st.session_state["final_state"]
 
-    st.markdown("---")
-    st.subheader("📊 Final Report")
-    st.markdown(final_state["final_report"])
+    # ── Tabs: Report | Dashboard ───────────────────────────────
+    tab_report, tab_dashboard = st.tabs(["📝 Report", "📊 Dashboard"])
 
-    # Plots
-    if final_state.get("generated_plots"):
-        st.subheader("📈 Generated Plots")
-        plot_cols = st.columns(min(len(final_state["generated_plots"]), 2))
-        for i, plot_path in enumerate(final_state["generated_plots"]):
-            if os.path.exists(plot_path):
-                with plot_cols[i % 2]:
-                    st.image(plot_path, use_container_width=True)
+    with tab_report:
+        st.markdown(final_state["final_report"])
+
+    with tab_dashboard:
+        render_static_dashboard(final_state)
 
     # PDF download
     st.markdown("---")
@@ -218,7 +217,7 @@ if "final_state" in st.session_state:
 # ── Follow-up Chat ─────────────────────────────────────────
     st.markdown("---")
     st.subheader("💬 Ask Follow-up Questions")
-    st.caption("Chat with the agent — ask questions or request new plots")
+    st.caption("Chat with the agent — ask questions or make requests")
 
     if "chat_history" not in st.session_state:
         st.session_state["chat_history"] = []
@@ -238,7 +237,7 @@ if "final_state" in st.session_state:
             st.session_state["chat_memory"] = []
             st.rerun()
 
-    if prompt := st.chat_input("Ask anything or request a plot..."):
+    if prompt := st.chat_input("Ask anything ..."):
         st.session_state["chat_history"].append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.markdown(prompt)
@@ -257,22 +256,62 @@ if "final_state" in st.session_state:
                     plot_keywords = ["plot", "chart", "graph", "draw", "visualize",
                                     "histogram", "scatter", "bar", "pie", "heatmap"]
                     wants_plot = any(kw in prompt.lower() for kw in plot_keywords)
+                    # Detect if user wants a dashboard
+                    dashboard_keywords = ["dashboard", "interactive", "plotly",
+                                        "interactive chart", "interactive plot",
+                                        "zoomable", "hoverable"]
+                    wants_dashboard = any(kw in prompt.lower() for kw in dashboard_keywords)
+
+                    # Detect if user wants a static plot
+                    plot_keywords = ["plot", "chart", "graph", "draw", "visualize",
+                                    "histogram", "scatter", "bar", "pie", "heatmap"]
+                    wants_plot = any(kw in prompt.lower() for kw in plot_keywords) and not wants_dashboard
+
+                    if wants_dashboard:
+                        df = pd.read_json(StringIO(final_state.get("df_json", ""))).copy(deep=True)
+
+                        from plotly_generator import render_plotly_dashboard
+                        interpretation, success = render_plotly_dashboard(
+                            df=df,
+                            prompt=prompt,
+                            client=client,
+                            MODEL=MODEL
+                        )
+
+                        if success:
+                            if interpretation:
+                                st.markdown(interpretation)
+                            st.session_state["chat_history"].append({
+                                "role": "assistant",
+                                "content": "📊 Interactive dashboard generated above."
+                            })
+                            st.session_state["chat_memory"].append({
+                                "role": "user", "content": prompt
+                            })
+                            st.session_state["chat_memory"].append({
+                                "role": "assistant", "content": "Interactive Plotly dashboard was generated and displayed."
+                            })
+                        else:
+                            # Fallback to static plot if Plotly fails
+                            st.warning("Could not generate interactive dashboard, falling back to static plot.")
+                            wants_plot = True
 
                     if wants_plot:
                         # Ask LLM to generate Python code for the plot
                         df = pd.read_json(StringIO(final_state.get("df_json", "")))
 
-                        code_prompt = f"""The user wants a plot. Generate ONLY Python code using matplotlib/seaborn.
+                        code_prompt = f"""The user wants a plot. Generate using ONLY Python code using matplotlib/seaborn.
 The dataframe is called `df` and has these columns: {list(df.columns)}.
 User request: {prompt}
 
 Rules:
+- NEVER ask clarifying questions — make a reasonable assumption and generate the code
+- If the request is ambiguous, pick the most relevant numeric or categorical column automatically
 - Use plt.figure() to create the plot
 - Add title and axis labels
 - Use print() to describe what the plot shows
 - Do NOT call plt.show()
 - if you generate a plot, it will be auto-saved and shown to the user, so just focus on generating correct code.
-- If the request is ambiguous, ask the user for clarification instead of guessing.
 - If you cannot generate a plot, say that you can not and if possible respond with a concise explanation in print() instead."""
 
                         code_response = client.chat.completions.create(
@@ -286,7 +325,16 @@ Rules:
                         # Strip markdown fences if present
                         if code.startswith("```"):
                             code = code.split("\n", 1)[1].rsplit("```", 1)[0].strip()
-
+                        try:
+                            ast.parse(code)
+                        except SyntaxError:
+                            # LLM returned text/question instead of code — show it as message
+                            st.markdown(code)
+                            st.session_state["chat_history"].append({
+                                "role": "assistant",
+                                "content": code
+                            })
+                            st.stop()
                         result = run_python(code, df)
 
                         if result["plots"]:

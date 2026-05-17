@@ -12,7 +12,7 @@ def planner_node(state: AnalystState) -> AnalystState:
     client = get_client()
     tracer.log("planner", "Starting planning phase")
 
-    df = pd.read_csv(state["dataset_path"])
+    df = pd.read_csv(state["dataset_path"], encoding="utf-8")  # Adjust encoding as needed
     profile = analyze_dataframe(df)
 
     tracer.log("planner", "EDA profile generated", {"shape": profile["shape"]})
