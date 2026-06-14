@@ -128,11 +128,23 @@ you can of course use any other LLm api you have, NVIDIA is just an example and 
    "
   ```
   ```
+  "Perform a comprehensive exploratory data analysis (EDA) of this dataset. Identify data quality issues (missing values, duplicates, outliers, inconsistent    values), summarize the distributions of all variables, analyze relationships between features, identify the key drivers of employee attrition, generate      appropriate visualizations, and conclude with actionable business recommendations. Explain every major finding and justify your conclusions using            evidence from the data."
+  ```
+  ```
   Analyze the dataset and provide business insights to improve profitability.
   ```
   ```
   If you were a manager, what actions would you take based on this data?
   ```
-  ```
+  ---
+  ## Screenshots
+
+  <img width="1230" height="563" alt="image" src="https://github.com/user-attachments/assets/c0c3699b-c3df-4a11-830d-9d4cbbcdef66" />
+  <img width="1400" height="663" alt="Screenshot 2026-06-14 174247" src="https://github.com/user-attachments/assets/4ee80365-aa47-43fe-9cf2-61bb99496b4a" />
+  <img width="1418" height="759" alt="Screenshot 2026-06-14 174417" src="https://github.com/user-attachments/assets/6e6be453-0b8e-4bde-8d90-93e967adf220" />
+  <img width="1422" height="702" alt="Screenshot 2026-06-14 174440" src="https://github.com/user-attachments/assets/c8c42eb6-83b2-44d9-8200-158ef74429fe" />
+  <img width="1437" height="483" alt="Screenshot 2026-06-14 174548" src="https://github.com/user-attachments/assets/1350d2ed-66d3-4261-96f7-24ffd6835b5d" />
+  <img width="1092" height="477" alt="Screenshot 2026-06-14 174624" src="https://github.com/user-attachments/assets/d0cc7076-acb6-4e8f-bbde-f127f7f23498" />
+
   Which regions and product categories are underperforming and why?
   ```
