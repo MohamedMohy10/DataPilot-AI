@@ -117,18 +117,22 @@ you can of course use any other LLm api you have, NVIDIA is just an example and 
 
   Examples of a good prompt:
   ```
-  "Analyze this dataset and find key insights, correlations, and anomalies"
+  Analyze this dataset and find key insights, correlations, and anomalies.
   ```
   ```
-  "Perform full EDA, detect anomalies, test hypotheses, and generate key insights with visualizations.
-   Rules:
-  - All insights must include numerical evidence
-  - Use statistical validation where applicable
-  - Keep conclusions concise and grounded
-   "
+  Perform full EDA, detect anomalies, test hypotheses, and generate key insights with visualizations.
+  Rules:
+    - All insights must include numerical evidence
+    - Use statistical validation where applicable
+    - Keep conclusions concise and grounded
   ```
   ```
-  "Perform a comprehensive exploratory data analysis (EDA) of this dataset. Identify data quality issues (missing values, duplicates, outliers, inconsistent    values), summarize the distributions of all variables, analyze relationships between features, identify the key drivers of employee attrition, generate      appropriate visualizations, and conclude with actionable business recommendations. Explain every major finding and justify your conclusions using            evidence from the data."
+  Perform a comprehensive exploratory data analysis (EDA) of this dataset.
+  Identify data quality issues (missing values, duplicates, outliers, inconsistent values),
+  summarize the distributions of all variables, analyze relationships between features,
+  identify the key drivers of employee attrition, generate appropriate visualizations,
+  and conclude with actionable business recommendations.
+  Explain every major finding and justify your conclusions using evidence from the data.
   ```
   ```
   Analyze the dataset and provide business insights to improve profitability.
