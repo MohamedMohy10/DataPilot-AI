@@ -1,54 +1,70 @@
-from openai import OpenAI
+import json
 from state import AnalystState
 from observability.tracer import tracer
-from config import get_client, MODEL, MAX_ITERATIONS, MAX_RETRIES
+from config import get_client, MODEL
+from prompts.final_answer import FINAL_ANSWER_SYSTEM, REPORT_USER
 
-
-REPORT_SYSTEM = """You are a senior data analyst writing a final analysis report.
-Write in clear, executive-friendly language.
-Base EVERY claim strictly on the insights provided — no hallucinations.
-Format with markdown headers."""
 
 def final_answer_node(state: AnalystState) -> AnalystState:
     client = get_client()
+    tracer.log("final_answer", "Generating evidence-based report")
 
-    tracer.log("final_answer", "Generating final report")
+    analysis_results = state.get("analysis_results", {})
+    plots = state.get("generated_plots", [])
 
-    insights_text = "\n".join(f"- {i}" for i in state["accumulated_insights"])
-    plots_text = "\n".join(state["generated_plots"]) if state["generated_plots"] else "None"
+    # Build results summary — only what was actually computed
+    results_summary = {
+        "dataset_summary": analysis_results.get("dataset_summary", {}),
+        "missing_values": analysis_results.get("missing_values", {}),
+        "duplicates": analysis_results.get("duplicates", {}),
+        "outliers": analysis_results.get("outliers", {}),
+        "correlations": {
+            "method": analysis_results.get("correlations", {}).get("method", ""),
+            "strong_pairs": analysis_results.get("correlations", {}).get("strong_pairs", [])
+        },
+        "target_analysis": analysis_results.get("target_analysis", {}),
+        "statistical_tests": analysis_results.get("statistical_tests", {}),
+        "step_insights": state.get("accumulated_insights", []),
+        "step_history_outputs": [
+            {
+                "step": h["step"],
+                "description": h["description"],
+                "output": str(h["result"].get("output", ""))[:500]
+            }
+            for h in state.get("step_history", [])
+            if h["result"].get("status") == "success"
+        ]
+    }
 
-    prompt = f"""Original query: {state['user_query']}
-
-Dataset: {state['df_shape'][0]} rows × {state['df_shape'][1]} columns
-Columns: {', '.join(state['df_columns'])}
-
-Insights gathered during analysis:
-{insights_text}
-
-Plots generated: {plots_text}
-
-Write a comprehensive final report covering:
-1. Executive Summary
-2. Key Findings (data-backed)
-3. Correlations & Patterns
-4. Anomalies
-5. Recommendations
-6. Limitations"""
+    prompt = REPORT_USER.format(
+        query=state["user_query"],
+        rows=state["df_shape"][0],
+        cols=state["df_shape"][1],
+        results=json.dumps(results_summary, indent=2, default=str)[:6000],
+        plots="\n".join(plots) if plots else "No plots generated"
+    )
 
     response = client.chat.completions.create(
         model=MODEL,
         messages=[
-            {"role": "system", "content": REPORT_SYSTEM},
+            {"role": "system", "content": FINAL_ANSWER_SYSTEM},
             {"role": "user", "content": prompt}
         ],
-        temperature=0.3,
-        #max_tokens=2000, <- adjust as needed based on your model limits
+        temperature=0.1,
+        max_tokens=4000,
     )
 
     report = response.choices[0].message.content
     tracer.log("final_answer", "Report complete")
 
-    return {**state, "final_report": report}
+    # Update analysis_results with final insights for dashboard
+    analysis_results["insights"] = state.get("accumulated_insights", [])
+
+    return {
+        **state,
+        "final_report": report,
+        "analysis_results": analysis_results
+    }
 
 def answer_followup(question: str, memory: dict, report: str, df_json: str) -> str:
     client = get_client()

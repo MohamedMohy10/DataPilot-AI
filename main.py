@@ -36,6 +36,7 @@ def main():
         "df_profile": {},
         "df_columns": [],
         "df_shape": (0, 0),
+        "analysis_results": {},
     }
 
     console.print("\n[bold yellow]Starting agent...[/bold yellow]\n")

@@ -7,12 +7,17 @@ from nodes.memory import memory_node
 from nodes.final_answer import final_answer_node
 
 def route_after_evaluation(state: AnalystState) -> str:
-    """Conditional edge: where to go after evaluator."""
     decision = state["evaluation_decision"]
     if decision == "finalize":
         return "final_answer"
     else:
-        return "memory"  # both continue and retry go through memory first
+        return "memory"
+
+def route_after_memory(state: AnalystState) -> str:
+    """After memory update, check if we should finalize or continue executing."""
+    if state["evaluation_decision"] == "finalize":
+        return "final_answer"
+    return "executor"
 
 def build_graph() -> StateGraph:
     graph = StateGraph(AnalystState)
@@ -40,7 +45,15 @@ def build_graph() -> StateGraph:
     )
 
     # Memory always loops back to executor
-    graph.add_edge("memory", "executor")
+    # ✅ new
+    graph.add_conditional_edges(
+        "memory",
+        route_after_memory,
+        {
+            "executor": "executor",
+            "final_answer": "final_answer"
+        }
+    )
 
     # Final answer ends the graph
     graph.add_edge("final_answer", END)

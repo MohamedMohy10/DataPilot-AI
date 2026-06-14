@@ -33,3 +33,4 @@ class AnalystState(TypedDict):
 
     # Output
     final_report: str
+    analysis_results: dict  

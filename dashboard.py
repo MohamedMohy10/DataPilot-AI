@@ -45,44 +45,65 @@ def extract_metrics(report_text: str) -> list[dict]:
 
 
 def render_static_dashboard(final_state: dict):
-    """Render automatic static dashboard from analysis results."""
-
     st.markdown("---")
     st.subheader("📊 Analysis Dashboard")
 
-    report = final_state.get("final_report", "")
+    analysis = final_state.get("analysis_results", {})
     plots = final_state.get("generated_plots", [])
-    df_json = final_state.get("df_json", "")
-    columns = final_state.get("df_columns", [])
-    shape = final_state.get("df_shape", (0, 0))
-    insights = final_state.get("accumulated_insights", [])
+    insights = analysis.get("insights", []) or final_state.get("accumulated_insights", [])
 
-    # ── KPI Cards ─────────────────────────────────────────────
+    summary = analysis.get("dataset_summary", {})
+    missing = analysis.get("missing_values", {})
+    duplicates = analysis.get("duplicates", {})
+    correlations = analysis.get("correlations", {})
+    target = analysis.get("target_analysis", {})
+
+    # ── KPI Cards — from structured results only ───────────────
     st.markdown("#### 📌 Key Metrics")
 
-    # Always-available metrics
     kpi_data = [
-        {"label": "Total Rows", "value": f"{shape[0]:,}"},
-        {"label": "Total Columns", "value": str(shape[1])},
-        {"label": "Insights Found", "value": str(len(insights))},
-        {"label": "Plots Generated", "value": str(len(plots))},
+        {"label": "Total Rows", "value": f"{summary.get('rows', 0):,}"},
+        {"label": "Total Columns", "value": str(summary.get('columns', 0))},
+        {"label": "Missing Cells", "value": str(missing.get('total_missing_cells', 0))},
+        {"label": "Duplicate Rows", "value": str(duplicates.get('duplicate_rows', 0))},
     ]
 
-    # Try to extract more from report
-    extracted = extract_metrics(report)
-    for e in extracted:
-        if e["label"] not in [k["label"] for k in kpi_data]:
-            kpi_data.append(e)
+    if target:
+        target_col = target.get("target_column", "")
+        value_pcts = target.get("value_pcts", {})
+        if value_pcts:
+            top_val = list(value_pcts.keys())[0]
+            top_pct = list(value_pcts.values())[0]
+            kpi_data.append({
+                "label": f"{target_col}: {top_val}",
+                "value": f"{top_pct:.1f}%"
+            })
 
-    # Render KPI cards
+    strong_pairs = correlations.get("strong_pairs", [])
+    if strong_pairs:
+        top = strong_pairs[0]
+        kpi_data.append({
+            "label": f"Top Correlation",
+            "value": f"r={top['pearson_r']}"
+        })
+
     cols = st.columns(min(len(kpi_data), 4))
     for i, kpi in enumerate(kpi_data[:4]):
         with cols[i]:
             st.metric(label=kpi["label"], value=kpi["value"])
 
+    if len(kpi_data) > 4:
+        cols2 = st.columns(min(len(kpi_data) - 4, 4))
+        for i, kpi in enumerate(kpi_data[4:8]):
+            with cols2[i]:
+                st.metric(label=kpi["label"], value=kpi["value"])
+
     # ── Dataset Overview ──────────────────────────────────────
+    df_json = final_state.get("df_json", "")
     if df_json:
         try:
+            import pandas as pd
+            from io import StringIO
             df = pd.read_json(StringIO(df_json))
 
             with st.expander("📋 Dataset Overview", expanded=False):
@@ -94,26 +115,38 @@ def render_static_dashboard(final_state: dict):
                 with tab2:
                     numeric_df = df.select_dtypes(include='number')
                     if not numeric_df.empty:
-                        st.dataframe(
-                            numeric_df.describe().round(3),
-                            use_container_width=True
-                        )
+                        st.dataframe(numeric_df.describe().round(3), use_container_width=True)
 
                 with tab3:
-                    missing = df.isnull().sum()
-                    missing_pct = (missing / len(df) * 100).round(2)
-                    missing_df = pd.DataFrame({
-                        'Missing Count': missing,
-                        'Missing %': missing_pct
-                    }).sort_values('Missing Count', ascending=False)
-                    missing_df = missing_df[missing_df['Missing Count'] > 0]
-                    if missing_df.empty:
+                    cols_missing = missing.get("columns_with_missing", {})
+                    if not cols_missing:
                         st.success("✅ No missing values found")
                     else:
+                        missing_df = pd.DataFrame(cols_missing).T
                         st.dataframe(missing_df, use_container_width=True)
-
         except Exception:
             pass
+
+    # ── Statistical Results ───────────────────────────────────
+    if strong_pairs:
+        with st.expander("📐 Strong Correlations (Pearson)", expanded=False):
+            import pandas as pd
+            corr_df = pd.DataFrame(strong_pairs)
+            st.dataframe(corr_df, use_container_width=True)
+
+    if target:
+        ttest = target.get("ttest_results", [])
+        chi2 = target.get("chi2_tests", [])
+
+        if ttest:
+            with st.expander("📊 T-Test Results vs Target", expanded=False):
+                import pandas as pd
+                st.dataframe(pd.DataFrame(ttest), use_container_width=True)
+
+        if chi2:
+            with st.expander("📊 Chi-Square Tests vs Target", expanded=False):
+                import pandas as pd
+                st.dataframe(pd.DataFrame(chi2), use_container_width=True)
 
     # ── Key Insights ──────────────────────────────────────────
     if insights:
@@ -122,18 +155,15 @@ def render_static_dashboard(final_state: dict):
                 st.markdown(f"**{i}.** {insight}")
 
     # ── Generated Plots Grid ──────────────────────────────────
-    if plots:
-        import os
-        valid_plots = [p for p in plots if os.path.exists(p)]
+    import os
+    valid_plots = [p for p in plots if os.path.exists(p)]
 
-        if valid_plots:
-            st.markdown("#### 📈 Visualizations")
-
-            # Render in 2-column grid
-            for i in range(0, len(valid_plots), 2):
-                cols = st.columns(2)
-                with cols[0]:
-                    st.image(valid_plots[i], use_container_width=True)
-                if i + 1 < len(valid_plots):
-                    with cols[1]:
-                        st.image(valid_plots[i + 1], use_container_width=True)
+    if valid_plots:
+        st.markdown("#### 📈 Visualizations")
+        for i in range(0, len(valid_plots), 2):
+            cols = st.columns(2)
+            with cols[0]:
+                st.image(valid_plots[i], use_container_width=True)
+            if i + 1 < len(valid_plots):
+                with cols[1]:
+                    st.image(valid_plots[i + 1], use_container_width=True)
