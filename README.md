@@ -149,6 +149,4 @@ you can of course use any other LLm api you have, NVIDIA is just an example and 
   <img width="1422" height="702" alt="Screenshot 2026-06-14 174440" src="https://github.com/user-attachments/assets/c8c42eb6-83b2-44d9-8200-158ef74429fe" />
   <img width="1437" height="483" alt="Screenshot 2026-06-14 174548" src="https://github.com/user-attachments/assets/1350d2ed-66d3-4261-96f7-24ffd6835b5d" />
   <img width="1092" height="477" alt="Screenshot 2026-06-14 174624" src="https://github.com/user-attachments/assets/d0cc7076-acb6-4e8f-bbde-f127f7f23498" />
-
-  Which regions and product categories are underperforming and why?
   ```
